@@ -14,8 +14,8 @@ pygame.display.set_caption("Jogo de Nave")
 branco = (255, 255, 255)
 
 # Nave
-nave_img = pygame.image.load("nave.jpg")
-nave = pygame.Rect(largura // 2 - 32, altura - 64, 64, 64)
+nave_img = pygame.image.load("nave.png")
+nave = pygame.Rect(largura // 2, altura - 64, 64, 64)
 
 # Asteróides
 asteroides = []
