@@ -1,59 +1,66 @@
 import pygame
-import random
 
-# Inicialização do Pygame
+BLACK = pygame.Color(0, 0, 0)
+WHITE = pygame.Color(255, 255, 255)
+
+
 pygame.init()
 
-# Configurações do jogo
-largura = 800
-altura = 600
-tela = pygame.display.set_mode((largura, altura))
-pygame.display.set_caption("Jogo de Nave")
+screen = pygame.display.set_mode((640, 480))
 
-# Cores
-branco = (255, 255, 255)
+pygame.display.set_caption('Colisão')
 
-# Nave
-nave_img = pygame.image.load("nave.png")
-nave = pygame.Rect(largura // 2, altura - 64, 64, 64)
+ball = pygame.Rect(300,230,20,20)
 
-# Asteróides
-asteroides = []
-SPAWN_ASTEROID_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(SPAWN_ASTEROID_EVENT, 1000)
+position_player_one = 210
+position_player_two = 210
 
-# Loop principal do jogo
-rodando = True
+player_one = pygame.Rect(20,position_player_one,20,60)
+player_two = pygame.Rect(600,position_player_one,20,60)
+
+pads = [player_one, player_two]
+
+velocity_x = 0.1
+
 clock = pygame.time.Clock()
-while rodando:
-    for evento in pygame.event.get():
-        if evento.type == pygame.QUIT:
-            rodando = False
-        elif evento.type == SPAWN_ASTEROID_EVENT:
-            tamanho = random.randint(20, 50)
-            asteroides.append(pygame.Rect(random.randint(0, largura - tamanho), 0, tamanho, tamanho))
 
-    # Lógica do jogo
-    teclas = pygame.key.get_pressed()
-    if teclas[pygame.K_LEFT] and nave.left > 0:
-        nave.x -= 5
-    if teclas[pygame.K_RIGHT] and nave.right < largura:
-        nave.x += 5
 
-    # Movimento dos asteróides
-    for asteroide in asteroides:
-        asteroide.y += 3
-        if asteroide.colliderect(nave):
-            asteroides.remove(asteroide)
+while True:
+    dt = clock.tick(30)
+    event = pygame.event.poll()
 
-    # Renderização
-    tela.fill(branco)
-    tela.blit(nave_img, nave)
-    for asteroide in asteroides:
-        pygame.draw.rect(tela, (255, 0, 0), asteroide)
-    pygame.display.update()
+    if event.type == pygame.QUIT:
+        break
+    
 
-    clock.tick(60)
+    ball.move_ip(velocity_x * dt, 0)
 
-# Encerramento do Pygame
+    if ball.collidelist(pads) >= 0:
+        velocity_x = -velocity_x
+        
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:
+        position_player_one -= 10
+    if keys[pygame.K_s]:
+        position_player_one += 10
+    if keys[pygame.K_i]:
+        position_player_two -= 10
+    if keys[pygame.K_k]:
+        position_player_two += 10
+
+    position_player_one = max(0, min(position_player_one, 420))
+    position_player_two = max(0, min(position_player_two, 420))
+    
+    player_one.y = position_player_one
+    player_two.y = position_player_two
+
+    screen.fill(BLACK)
+
+    pygame.draw.rect(screen, WHITE, ball)
+    
+    for pad in pads:
+        pygame.draw.rect(screen, WHITE, pad)
+    pygame.display.flip()
+
+
 pygame.quit()
