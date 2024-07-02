@@ -1,5 +1,6 @@
 import pygame
 import sys
+
 # Inicializar o Pygame
 pygame.init()
 
@@ -18,54 +19,46 @@ spaceshipImage = pygame.transform.scale(image, (int(image.get_width() * 0.1), in
 
 # Obter o retângulo da nave espacial
 rectSpaceship = spaceshipImage.get_rect()
-rectSpaceship.center = (400, 300)
+rectSpaceship.center = (400, 600)
 
-# Velocidade da nave e parâmetros de aceleração
-spaceshipSpeed = 0
-spaceshipAcceleration = 0.1
-spaceshipMaxSpeed = 5
+# Parâmetros de velocidade
+speed_y = -0.6  # Definir uma velocidade inicial negativa para movimento para cima
+acceleration = 0.1
+max_speed = 10
+min_speed = 0.6  # Velocidade mínima constante
+
+# Configurar o controle de frame rate
+clock = pygame.time.Clock()
+fps = 60  # Definir o número de frames por segundo (FPS)
 
 # Loop principal
 while True:
-    # Checar se o usuário fechou o jogo
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
     
-    # Capturar as teclas pressionadas
     teclas = pygame.key.get_pressed()
     
-    # Movimentar a nave com aceleração
-    if teclas[pygame.K_LEFT]:
-        spaceshipSpeed = max(spaceshipSpeed - spaceshipAcceleration, -spaceshipMaxSpeed)
-        rectSpaceship.x += spaceshipSpeed
-    elif teclas[pygame.K_RIGHT]:
-        spaceshipSpeed = min(spaceshipSpeed + spaceshipAcceleration, spaceshipMaxSpeed)
-        rectSpaceship.x += spaceshipSpeed
-    elif teclas[pygame.K_UP]:
-        spaceshipSpeed = max(spaceshipSpeed - spaceshipAcceleration, -spaceshipMaxSpeed)
-        rectSpaceship.y += spaceshipSpeed
+    if teclas[pygame.K_UP]:
+        speed_y = max(speed_y - acceleration, -max_speed)
     elif teclas[pygame.K_DOWN]:
-        spaceshipSpeed = min(spaceshipSpeed + spaceshipAcceleration, spaceshipMaxSpeed)
-        rectSpaceship.y += spaceshipSpeed
+        if speed_y <-1:
+            speed_y = min(speed_y + acceleration, max_speed)
     else:
-        spaceshipSpeed = 0  # Zerar a velocidade se nenhuma tecla for pressionada
+        # Diminuindo a velocidade aos poucos se não houver tecla pressionada
+        if speed_y < -0.6:
+            speed_y += 0.01
+  
+    rectSpaceship.y += speed_y
 
-    # Garantir que a nave permaneça dentro dos limites da tela
-    if rectSpaceship.left < 0:
-        rectSpaceship.left = 0
-    if rectSpaceship.right > 800:
-        rectSpaceship.right = 800
     if rectSpaceship.top < 0:
-        rectSpaceship.top = 0
+        rectSpaceship.top = 600
     if rectSpaceship.bottom > 600:
         rectSpaceship.bottom = 600
 
-    # Pintar a tela de fundo
     screen.fill(background_color)
-    
-    # Desenhar a nave na posição atual
     screen.blit(spaceshipImage, rectSpaceship)
-
     pygame.display.flip()
+
+    clock.tick(fps)
